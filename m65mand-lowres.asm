@@ -2,9 +2,9 @@
 !cpu m65
 !convtab pet
 
-!source "mega65defs.asm"
-!source "manddefs.asm"
-!source "fixedptdefs.asm"
+!source "include/mega65defs.asm"
+!source "include/manddefs.asm"
+!source "include/fixedptdefs.asm"
 REVERSE_SPACE     = $A0
 
         * = $2001               ; start of basic for mega65
@@ -157,6 +157,6 @@ dma_cls:
         !byte $00       ; cmd msb (unused)
         !word $0000     ; modulo (ignored)
 
-!source "fixedpt.asm"
+!source "include/fixedpt.asm"
 
-!source "mandelbrot.asm"
+!source "include/mandelbrot.asm"
