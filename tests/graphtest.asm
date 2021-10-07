@@ -1,7 +1,7 @@
 !to "graphtest.prg", cbm
 !cpu m65
 
-!source "mega65defs.asm"
+!source "include/mega65defs.asm"
 
         * = $2100
 
@@ -287,4 +287,4 @@ dma_copypal:
         !byte $80       ; dma visible(7)
         !word $0000
 
-!source "x16pal.asm"
+!source "include/x16pal.asm"

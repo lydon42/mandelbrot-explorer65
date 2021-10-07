@@ -1,7 +1,7 @@
 !to "mathtest.prg", cbm
 !cpu m65
 
-!source "mega65defs.asm"
+!source "include/mega65defs.asm"
 
         * = $2100
 
