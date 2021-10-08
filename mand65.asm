@@ -2,11 +2,13 @@
 !cpu m65
 !convtab pet
 
-!source "mega65defs.asm"
+!source "include/mega65defs.asm"
 !source "mandelbrot32defs.asm"
 !source "fixedpt32defs.asm"
 
         * = $2001               ; start of basic for mega65
+
+DEBUG=0
 
 ; some locations need to be defined
 !address        SCREENMEM = $3000
@@ -26,14 +28,28 @@
 ;; 40 CURSOR ON,35,1:PRINT ET:CURSOR ON,1,21
 ;;
 basic:
-        !word @last, 10          ; line 10
+        !word @line20, 10       ; line 10
+        !byte $9c               ; CLR
+        !text " ti"             ; TI
+        !byte 0                 ; eol
+@line20:
+        !word @line30, 20       ; line 20
         !byte $fe, $02          ; BANK
         !text "0:"              ; 0:
         !byte $9e               ; SYS $9e
         ; start address in hex as ascii codes
         !text "$"
 @this:                          ; macro won't work with forward def'ed label
-        +label2hexstr @this+7   ; 4 bytes hexstr, 3 bytes 0 (eol and eop)
+        +label2hexstr @this+27  ; 4 bytes hexstr, 3 bytes 0 (eol and eop)
+        !byte 0                 ; eol
+@line30:
+        !word @line40, 30       ; line 30
+        !text "et", $b2, "ti"   ; et=ti
+        !byte 0                 ; eol
+@line40:
+        !word @last, 40         ; line 40
+        !byte $e8, $3a, $99     ; scnclr:print
+        !text "et"              ; et
         !byte 0                 ; eol
 @last:
         !word 0                 ; eop
@@ -124,11 +140,8 @@ start:
         sta VICIV_BORDERCOL
         sta VICIV_SCREENCOL     ; black back and border
 
-        lda #%11000000
-        bit VICIV_PALETTE
-        beq +
-        lda #0
-+       sta VICIV_PALETTE       ; toggle palette to something else
+        lda #%01010101
+        sta VICIV_PALETTE       ; toggle palette to something else
 
         ; copy palette
         lda #0
@@ -200,11 +213,25 @@ xloop:
         sta scrn_y              ; y = 200
 yloop:
         ; do mandel stuff
+        jsr mb_iter
+
+!if DEBUG {
+        ; break at some point to inspect iteration data
+        lda scrn_x
+        cmp #150
+        bne +
+        lda scrn_y
+        cmp #130
+        bne +
+        jmp endloop
++
+}
 
         ; draw pixel
-        lda scrn_y
-        clc
-        adc #32
+        ;lda scrn_y
+        lda #128
+        sec
+        sbc mand_iter
         ldz #0
         sta [scrn_point],z
 
@@ -243,7 +270,7 @@ yloop:
         lda #7
         bit scrn_row
         bne @smallrow           ; check if we reached 8
-        lda #<1592              ; one row of characters is 25*64-8
+        lda #<1592              ; one row of characters is 25*64-8 (we already advanced 8...)
         clc
         adc scrn_row
         sta scrn_row
@@ -294,12 +321,14 @@ endloop:
         rts                     ; return
 
 waitkey:
+!if 0 {
         ; clear key buffer
 -       lda UART_ASCIIKEY
         beq +
         sta UART_ASCIIKEY
         bra -
 +
+}
         ; wait for key
 -       lda UART_ASCIIKEY
         beq -
@@ -346,4 +375,4 @@ dma_copypal:
 
 !source "mandelbrot32.asm"
 
-!source "x16pal.asm"
+!source "include/x16pal.asm"

@@ -42,4 +42,63 @@ mb_init:
         rts
 
 mb_iter:
+        ; algo:
+        ;
+        ;   zr = cr
+        ;   zi = ci
+        ;   iter = max_iter-1
+        ;   do until zr² + zi² > 4
+        ;     zr' = zr² - zi² + cr
+        ;     zi' = zr*zi + ci
+        ;     iter++
+        ;   loop while iter > 0
+        ;   return iter
+        ;
+
+        +DEBUG_INIT $4000
+        lda #MAND_MAXITER-1             ; we decrement iterations, because it's easier to check if done
+        sta mand_iter
+        +FP_MOV mand_cr, mand_zr
+        +FP_MOV mand_ci, mand_zi        ; first iteration done! that was fast!
+@loopiter:
+        +DEBUG_VAL mand_zr
+        +DEBUG_VAL mand_zi
+        +FP_MOV mand_zi, FP_A
+        jsr fp_square
+        +DEBUG_VAL FP_C
+        +FP_MOV FP_C, FP_B              ; FP_B = zi²
+        +FP_MOV mand_zr, FP_A
+        jsr fp_square
+        +DEBUG_VAL FP_C
+        +FP_MOV FP_C, FP_A              ; FP_A = zr²
+        jsr fp_add                      ; FP_C = FP_A(zr²) + FP_B(zi²)
+        +DEBUG_VAL FP_C
+        lda FP_C+3
+        cmp #4                          ; FP_C[3] > 4?
+        bcc +
+        jmp @enditer                    ; we can stop here
++       jsr fp_subtract                 ; FP_C = FP_A(zr²) - FP_B(zi²)
+        +DEBUG_VAL FP_C
+        +FP_MOV FP_C, FP_A
+        +FP_MOV mand_cr, FP_B
+        jsr fp_add                      ; FP_C(zr') = zr² - zi² + cr
+        +FP_MOV mand_zr, FP_A
+        +FP_MOV mand_zi, FP_B           ; preload next op, so we can save zr
+        +FP_MOV FP_C, mand_zr           ; zr' = FP_C
+        jsr fp_multiply                 ; FP_C = zr*zi
+        +DEBUG_VAL FP_C
+        +FP_SL_X FP_C, 1                ; FP_C << 1 (*2)
+        +DEBUG_VAL FP_C
+        +FP_MOV FP_C, FP_A
+        +FP_MOV mand_ci, FP_B
+        jsr fp_add                      ; FP_C = 2*zr*zi+ci
+        +FP_MOV FP_C, mand_zi           ; zi' = FP_C
+        dec mand_iter
+        beq @enditer
+
+        +DEBUG_LOOP
+
+        jmp @loopiter
+
+@enditer:
         rts

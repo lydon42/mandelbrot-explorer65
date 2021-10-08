@@ -21,7 +21,7 @@ FP_R  = $8C
 }
 
 ; load 32bit data from one address into two others
-!macro FP_DMOV .from, .to1, .to2 {
+!macro FP_MOV .from, .to1, .to2 {
         lda .from
         sta .to1
         sta .to2
@@ -64,17 +64,91 @@ FP_R  = $8C
         lda #0
         sbc .from+3
         sta .to+3
-+
+        bra ++
++       lda .from
+        sta .to
+        lda .from+1
+        sta .to+1
+        lda .from+2
+        sta .to+2
+        lda .from+3
+        sta .to+3
+++     
+}
+
+; make .addr negative
+!macro FP_MINUS .addr {
+        lda #0
+        sec
+        sbc .addr
+        sta .addr
+        lda #0
+        sbc .addr+1
+        sta .addr+1
+        lda #0
+        sbc .addr+2
+        sta .addr+2
+        lda #0
+        sbc .addr+3
+        sta .addr+3
+}
+
+; make .from negative and store in .to
+!macro FP_NEG .from, .to {
+        lda #0
+        sec
+        sbc .from
+        sta .to
+        lda #0
+        sbc .from+1
+        sta .to+1
+        lda #0
+        sbc .from+2
+        sta .to+2
+        lda #0
+        sbc .from+3
+        sta .to+3
+}
+
+; make .from negative and store in .to1 and .to2
+!macro FP_NEG .from, .to1, .to2 {
+        lda #0
+        sec
+        sbc .from
+        sta .to1
+        sta .to2
+        lda #0
+        sbc .from+1
+        sta .to1+1
+        sta .to2+1
+        lda #0
+        sbc .from+2
+        sta .to1+2
+        sta .to2+2
+        lda #0
+        sbc .from+3
+        sta .to1+3
+        sta .to2+3
 }
 
 ; shift .addr(32) right .count times
 !macro FP_SR_X .addr, .count {
         ldx #.count
--       clc
-        asr .addr+3
+-       asr .addr+3
         ror .addr+2
         ror .addr+1
         ror .addr
+        dex
+        bne -
+}
+
+; shift .addr(32) left .count times
+!macro FP_SL_X .addr, .count {
+        ldx #.count
+-       asl .addr
+        rol .addr+1
+        rol .addr+2
+        rol .addr+3
         dex
         bne -
 }
