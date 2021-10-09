@@ -1,4 +1,5 @@
 10 rem init graphics 320x200x8bpp
+15 fast 40
 20 graphic clr
 30 screen def 1,0,0,8
 40 screen open 1
