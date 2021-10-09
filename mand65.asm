@@ -317,7 +317,8 @@ endloop:
 
         lda #0
         tab                     ; restore base-page to 0
-        cli                     ; allow interrupts
+        ;dec $D019              ; this before the cli to clear pending interrupt?
+        ;cli                    ; allow interrupts - BASIC SYS handles this
         rts                     ; return
 
 waitkey:

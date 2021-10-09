@@ -3,6 +3,7 @@
 
 ## Near Future
 
+- switch fast inside program: LDA #65 / STA $0
 - hack Q opcodes into xemu
 - switch to Q opcodes
 - Timing via CIA2 inside assembler

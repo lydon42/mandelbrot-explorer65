@@ -50,7 +50,7 @@ mb_iter:
         ;   do until zr² + zi² > 4
         ;     zr' = zr² - zi² + cr
         ;     zi' = zr*zi + ci
-        ;     iter++
+        ;     iter--
         ;   loop while iter > 0
         ;   return iter
         ;
