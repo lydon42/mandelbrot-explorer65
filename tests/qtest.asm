@@ -116,7 +116,7 @@ test:
         lda #>dma_cls
         sta DMA_ADDRMSB
         lda #<dma_cls
-        sta DMA_ADDRLSB_ETRIG   ; clear screen & charram
+        sta DMA_ADDRLSB_ETRIG   ; clear screen & cram
 
         lda #$2f
         tab
@@ -212,6 +212,7 @@ test:
         ; cli done by basic sys call
         rts
 
+        ; adds A to scrnptr
 advance_screen:
         clc
         adc scrnptr
@@ -221,6 +222,10 @@ advance_screen:
         sta scrnptr+1
         rts
 
+        ; writes 0 terminated string to scrnptr
+        ; A - string pointer low
+        ; X - string pointer high
+        ; Y is used as index
 display_string:
         sta strptr
         stx strptr+1
@@ -233,6 +238,9 @@ display_string:
 +       rts
 
         ; display the current registers
+        ; needs all registers and flags
+        ; changes everything.
+        ; writes at scrnptr, does not change it
 display_registers:
         php             ; first save the stuff
         pha             ; A is lsb of Q, we want this last
@@ -270,7 +278,10 @@ display_registers:
         iny
         rts
 
-        ; display byte from A to current screen location
+        ; write byte to screen
+        ; A - byte to write
+        ; X - used in code
+        ; Y - offset to scrnptr, is inc'ed 2 times
 display_byte:
         tax             ; save for low nyb
         clc
@@ -352,7 +363,7 @@ display_flags:
         rts
 
 dma_cls:
-        ; clear character rom
+        ; clear screen and cram
         !byte $0a, $00  ; no enhanced options
         !byte DMA_FILL|DMA_CHAIN
         !word 80*25

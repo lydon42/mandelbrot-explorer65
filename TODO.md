@@ -3,7 +3,9 @@
 
 ## Near Future
 
+- extract graphics init/restore into lib
 - palette generation based on iteration depth
+- fix Q opcodes in VHDL (write unit tests)
 - hack Q opcodes into xemu
 - switch to Q opcodes
 - Timing via CIA2 inside assembler
