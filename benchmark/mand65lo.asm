@@ -1,4 +1,4 @@
-!to "man.prg", cbm
+!to "mand65lo.prg", cbm
 !cpu m65
 !convtab pet
 

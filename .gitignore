@@ -3,3 +3,9 @@
 *.d81
 *.D81
 .~*
+.source.txt
+*.lst
+*.sym
+*.dbg
+*.vs
+.kickass/*
