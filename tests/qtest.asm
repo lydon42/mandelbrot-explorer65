@@ -4,7 +4,7 @@
 
 DEBUG=0
 
-!source "../include/mega65defs.asm"
+!source "../benchmark/include/mega65defs.asm"
 
 !zone main
 

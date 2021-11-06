@@ -1,7 +1,7 @@
 !to "graphtest.prg", cbm
 !cpu m65
 
-!source "include/mega65defs.asm"
+!source "../benchmark/include/mega65defs.asm"
 
         * = $2100
 
