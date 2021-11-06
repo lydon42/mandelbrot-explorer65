@@ -5,6 +5,7 @@
 .~*
 .source.txt
 *.lst
+*.log
 *.sym
 *.dbg
 *.vs

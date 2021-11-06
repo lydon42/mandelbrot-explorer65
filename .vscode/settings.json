@@ -1,0 +1,4 @@
+{
+    "kickassembler.startup": "mand65.ks",
+    "kickassembler.outputDirectory": ".kickass"
+}

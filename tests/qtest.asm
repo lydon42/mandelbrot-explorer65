@@ -138,13 +138,16 @@ test:
         lda #25
         jsr advance_screen
 
-        ldz start_val+3
-        ldy start_val+2
-        ldx start_val+1
+startval:
         lda start_val
+        ldx start_val+1
+        ldy start_val+2
+        ldz start_val+3
         cmp #0
         clc
         +STORE_STATE
+
+@display:
         jsr display_registers
         lda #55
         jsr advance_screen
@@ -155,9 +158,12 @@ test:
         lda #25
         jsr advance_screen
 
+doldq:
         +RESTORE_STATE
         ldq (test1ptr)
         +STORE_STATE
+
+@display:
         jsr display_registers
         lda #55
         jsr advance_screen
@@ -168,10 +174,13 @@ test:
         lda #25
         jsr advance_screen
 
+doadcq:
         +RESTORE_STATE
         clc
         adcq (test1ptr)
         +STORE_STATE
+
+@display:
         jsr display_registers
         lda #55
         jsr advance_screen
