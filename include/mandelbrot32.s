@@ -10,10 +10,11 @@
  */
 
 // global start coordinates
-mand_base_r0: .byte $00, $00, $80, $fd  // -2.5
-mand_base_r1: .byte $00, $00, $00, $01  // +1.0
-mand_base_i0: .byte $00, $00, $b0, $fe  // -1.3125
-mand_base_i1: .byte $00, $00, $50, $01  // +1.3125
+
+mand_base_r0: .byte $67, $66, $a6, $fd  // rs=-2.35
+mand_base_r1: .byte $00, $00, $40, $01  // re=+1.25
+mand_base_i0: .byte $00, $00, $e0, $fe  // is=-1.125
+mand_base_i1: .byte $00, $00, $20, $01  // ie=+1.125
 
 // mand_init: initialize 
 mb_init:

@@ -1,6 +1,3 @@
-!ifndef VIC4FCM {
-VIC4FCM = 1
+#importonce
 
-!source "mega65defs.asm"
-
-}
+#import "mega65defs.s"

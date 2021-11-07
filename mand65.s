@@ -10,7 +10,7 @@
 .eval DEBUG = 0
 
 // some locations need to be defined
-.const BASEPAGE  = $2f
+.const BASEPAGE  = ((>theend)+1) // right after our program
 .const VICSTATE  = $f0    // basepage storage for old vic state
 .const SCREENMEM = $3000
 .const GRAPHMEM  = $40000 // this is character ram
@@ -92,9 +92,12 @@
         sta VICIV_SCRNPTR1
         lda #>SCREENMEM
         sta VICIV_SCRNPTR2
-        lda #0
+        lda #<[SCREENMEM >> 16]
         sta VICIV_SCRNPTR3
-        sta VICIV_SCRNPTR4      // set SCRNPTR to 0003000
+        sta scrn_point+2
+        lda #0
+        sta VICIV_SCRNPTR4
+        sta scrn_point+3
 
         sta VICIV_BORDERCOL
         sta VICIV_SCREENCOL     // black back and border
@@ -111,13 +114,11 @@
         sta DMA_ADDRLSB_ETRIG   // copy commander x16 palette
 
         // fill screen with pointers to $40000 y by x
-        lda #$0
-        sta scrn_point+2
-        sta scrn_point+3 // set high word of addr ptr to $0000
+        lda #<[GRAPHMEM>>6]
         sta scrn_row
-        lda #$10
-        sta scrn_row+1   // set $14 to current charcode $1000 = $40000 absolute
-        ldz #0           // z loop index
+        lda #>[GRAPHMEM>>6]
+        sta scrn_row+1          // set $14/$15 to current charcode $1000 = $40000 absolute
+        ldz #0                  // z loop index
 scrnfilx:
         lda #<SCREENMEM
         sta scrn_point
@@ -146,7 +147,6 @@ scrnfily:
         inz             // inc x index by 2
         cpz #80         // cmp to 80 (end of line)
         bne scrnfilx
-
 
 //
 // MANDELBROT
@@ -305,7 +305,7 @@ dma_cls:
         .word $0000     // fill tile 0
         .byte $00       // src bank (ignored)
         .word [GRAPHMEM & $ffff]  // dest
-        .byte [[GRAPHMEM & $ff0000]>>16] // destbnk(0-3) + flags
+        .byte <[GRAPHMEM>>16] // destbnk(0-3) + flags
         .word $0000     // modulo (ignored)
 
 dma_clscol:
@@ -322,7 +322,7 @@ dma_copypal:
         .byte $0a, $00  // 11 byte mode
         .byte DMA_COPY
         .word $300
-        .word cmdx16pal
+        .word palette
         .byte $00
         .word VICIII_PALRED
         .byte $80       // dma visible(7)
@@ -330,4 +330,14 @@ dma_copypal:
 
 #import "include/fixedpt32.s"
 #import "include/mandelbrot32.s"
-#import "include/x16pal.s"
+#import "include/palette.s"
+
+// Mandeldata:
+mand_base:
+        .byte 48 // 48 iterations
+        .byte $67, $66, $a6, $fd  // rs=-2.35
+        .byte $00, $00, $40, $01  // re=+1.25
+        .byte $00, $00, $e0, $fe  // is=-1.125
+        .byte $00, $00, $20, $01  // ie=+1.125
+
+theend: .byte 0
