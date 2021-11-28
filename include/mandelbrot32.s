@@ -24,7 +24,7 @@ mb_init:
          */
         FP_MOV(mand_base_r1, FP_A)
         FP_MOV(mand_base_r0, FP_B)
-        jsr fp_subtract           // base_r1 - base_r0 -> FP_C
+        FP_SUB()                  // base_r1 - base_r0 -> FP_C
         FP_MOV(FP_C, FP_A)        // FP_C -> FP_A
         FP_SR_X(FP_A, 6)          // FP_A >> 6  (divide by 64)
         FP_STOR_II(5, FP_B)       // we can't divide by 320, because we only have 8 bit
@@ -35,7 +35,7 @@ mb_init:
          */
         FP_MOV(mand_base_i1, FP_A)
         FP_MOV(mand_base_i0, FP_B)
-        jsr fp_subtract           // base_i1 - base_i0 -> FP_C
+        FP_SUB()                  // base_i1 - base_i0 -> FP_C
         FP_MOV(FP_C, FP_A)        // FP_C -> FP_A
         FP_SR_X(FP_A, 3)          // FP_A >> 3  (divide by 8)
         FP_STOR_II(5, FP_B)       // 5.0 -> FP_B
@@ -68,34 +68,34 @@ loopiter:
         DEBUG_VAL(mand_zr)
         DEBUG_VAL(mand_zi)
         FP_MOV(mand_zi, FP_A)
-        jsr fp_square
+        FP_SQUARE()
         DEBUG_VAL(FP_C)
         FP_MOV(FP_C, FP_B)              // FP_B = zi²
         FP_MOV(mand_zr, FP_A)
-        jsr fp_square
+        FP_SQUARE()
         DEBUG_VAL(FP_C)
         FP_MOV(FP_C, FP_A)              // FP_A = zr²
-        jsr fp_add                      // FP_C = FP_A(zr²) + FP_B(zi²)
+        FP_ADD()                        // FP_C = FP_A(zr²) + FP_B(zi²)
         DEBUG_VAL(FP_C)
         lda FP_C+3
         cmp #4                          // FP_C[3] > 4?
         bcc !cont+
         jmp enditer                     // we can stop here
-!cont:  jsr fp_subtract                 // FP_C = FP_A(zr²) - FP_B(zi²)
+!cont:  FP_SUB()                        // FP_C = FP_A(zr²) - FP_B(zi²)
         DEBUG_VAL(FP_C)
         FP_MOV(FP_C, FP_A)
         FP_MOV(mand_cr, FP_B)
-        jsr fp_add                      // FP_C(zr') = zr² - zi² + cr
+        FP_ADD()                        // FP_C(zr') = zr² - zi² + cr
         FP_MOV(mand_zr, FP_A)
         FP_MOV(mand_zi, FP_B)           // preload next op, so we can save zr
         FP_MOV(FP_C, mand_zr)           // zr' = FP_C
-        jsr fp_multiply                 // FP_C = zr*zi
+        FP_MULTIPLY()                   // FP_C = zr*zi
         DEBUG_VAL(FP_C)
         FP_SL_X(FP_C, 1)                // FP_C << 1 (*2)
         DEBUG_VAL(FP_C)
         FP_MOV(FP_C, FP_A)
         FP_MOV(mand_ci, FP_B)
-        jsr fp_add                      // FP_C = 2*zr*zi+ci
+        FP_ADD()                        // FP_C = 2*zr*zi+ci
         FP_MOV(FP_C, mand_zi)           // zi' = FP_C
         dec mand_iter
         beq enditer

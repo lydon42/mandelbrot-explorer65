@@ -1,9 +1,12 @@
 
-RM = /usr/bin/rm
-JAVA = /usr/bin/java
-KICKASS65JAR = /home/ograf/.bin/KickAss/KickAss65CE02.jar
-KS   = $(JAVA) -jar $(KICKASS65JAR)
+RM    = /usr/bin/rm
+JAVA  = /usr/bin/java
+KSJAR = /home/ograf/.bin/KickAss/KickAss65CE02.jar
+KS    = $(JAVA) -jar $(KSJAR)
 C1541 = /usr/bin/c1541
+
+BENCHMARK = -define BENCHMARK
+JUSTUSEQ = -define JUSTUSEQ
 
 ALLPRG = mand65.prg
 
@@ -24,7 +27,7 @@ benchmark:
 
 %.prg:	%.s include/*.s
 	@echo "Assembling $*.s"
-	@$(KS) $*.s -log $*.log -bytedumpfile $*.lst 2> /dev/null
+	@$(KS) $(BENCHMARK) $(JUSTUSEQ) $*.s -log $*.log -bytedumpfile $*.lst 2> /dev/null
 
 MAND65.D81: $(ALLPRG)
 	$(RM) -f MAND65.D81

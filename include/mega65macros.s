@@ -24,6 +24,33 @@ eop:
 	.byte $00,$00		// end of program
 }
 
+.macro BenchmarkUpstart(addr) {
+	* = $2001 "BASIC Upstart"
+
+	.encoding "petscii_upper"
+	.word line10, 10
+	.byte $9c
+	.text "TI:"
+	.byte $fe, $02
+	.text "0:"
+	.byte $9c
+	.text "TI:"
+	.byte $9e
+	.text "$"
+	.text toHexString(addr)
+        .text ":ET"
+	.byte $b2
+	.text "TI"
+        .byte 0
+line10:
+        .word eop, 20
+        .byte $e8, $3a, $99
+        .text "ET"
+        .byte 0
+eop:
+        .word 0
+}
+
 .macro GoFaster() {
 	lda #65
 	sta $00

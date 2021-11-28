@@ -19,9 +19,9 @@
  * Start of Mandelbrot Explorer 65
  */
 
-	Basic65Upstart($2012)
+	BenchmarkUpstart($2030)
 
-	* = $2012 "Program"
+	* = $2030 "Program"
 
 	GoFaster()
 	UnmapMemory()
@@ -73,7 +73,7 @@
         //// copied from basic.
         //// 40x25 - 80x50 screen, with screen RAM at $3000-$3FFF, colour RAM at $FF80000-$FF81FFF
         ////
-        //// IMPORTANT: setting scrnmode must come before changing scrnptr!
+        //// IMPORTANT: setting must come before changing scrnptr!
         ////
         lda #%10001000          // clear H640 and V400 for 320x200
         trb VICIII_SCRNMODE
@@ -153,8 +153,7 @@ scrnfily:
 //
         jsr mb_init             // initialize dr, di
 
-        // set cr
-        FP_MOV(mand_base_r0, mand_cr)
+        FP_MOV(mand_base_r0, mand_cr)   // set cr
         lda #0
         sta scrn_x
         sta scrn_x+1            // x = 0
@@ -166,13 +165,11 @@ scrnfily:
         lda #[[GRAPHMEM & $ff0000]>>16]
         sta scrn_point+2        // scrn_row = $0000, scrn_point = $0004.0000
 xloop:
-        // set ci
-        FP_MOV(mand_base_i0, mand_ci)
+        FP_MOV(mand_base_i0, mand_ci)   // set ci
         lda #200
         sta scrn_y              // y = 200
 yloop:
-        // do mandel stuff
-        jsr mb_iter
+        jsr mb_iter             // calculate mandelbrot
 
 .if (DEBUG==1) {
         // break at some point to inspect iteration data
@@ -194,10 +191,17 @@ yloop:
         ldz #0
         sta ((scrn_point)),z
 
+#if JUSTUSEQ
+        ldq mand_ci
+        clc
+        adcq mand_di
+        stq mand_ci
+#else
         FP_MOV(mand_ci, FP_A)
         FP_MOV(mand_di, FP_B)
         jsr fp_add
         FP_MOV(FP_C, mand_ci)   // advance c.i
+#endif
 
         lda #8
         clc
@@ -208,10 +212,17 @@ yloop:
 !nov:   dec scrn_y              // dec yloop counter
         bne yloop
 
+#if JUSTUSEQ
+        ldq mand_cr
+        clc
+        adcq mand_dr
+        stq mand_cr
+#else
         FP_MOV(mand_cr, FP_A)
         FP_MOV(mand_dr, FP_B)
         jsr fp_add
         FP_MOV(FP_C, mand_cr)   // advance c.r
+#endif
 
         inc scrn_x
         bne !nov+
@@ -247,7 +258,9 @@ smallrow:
         jmp xloop
 
 endloop:
+#if !BENCHMARK
         jsr waitkey
+#endif
 
         lda VICSTATE
         sta VICIII_SCRNMODE
