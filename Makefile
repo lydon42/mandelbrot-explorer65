@@ -4,10 +4,15 @@ JAVA  = /usr/bin/java
 KSJAR = /home/ograf/.bin/KickAss/KickAss65CE02.jar
 KS    = $(JAVA) -jar $(KSJAR)
 C1541 = /usr/bin/c1541
+M65   = /home/ograf/.bin/m65
 
-BENCHMARK = 
-#BENCHMARK = -define BENCHMARK
-JUSTUSEQ = -define JUSTUSEQ
+ASMOPTS = 
+ifdef BENCHMARK
+ASMOPTS += -define BENCHMARK
+endif
+ifndef NOQ
+ASMOPTS += -define JUSTUSEQ
+endif
 
 LIBDIR = include
 ALLPRG = mand65.prg
@@ -31,9 +36,12 @@ benchmark:
 tests:
 	$(MAKE) -C $@
 
+runmand65: mand65.prg
+	$(M65) -r mand65.prg
+
 %.prg:	%.s include/*.s
 	@echo "Assembling $*.s"
-	$(KS) $(BENCHMARK) $(JUSTUSEQ) -libdir $(LIBDIR) $*.s -log $*.log -bytedumpfile $*.lst 2> /dev/null
+	$(KS) $(ASMOPTS) -libdir $(LIBDIR) $*.s -log $*.log -bytedumpfile $*.lst 2> /dev/null
 
 MAND65.D81: $(ALLPRG)
 	$(RM) -f MAND65.D81

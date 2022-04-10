@@ -15,43 +15,40 @@
         * = $2001 "BASIC Upstart"
 
         .encoding "petscii_upper"
-        .byte <!eop+, >!eop+        // next line
-        .byte $0a, $00                // line 10
-        .byte $fe, $02                // BANK
+        .word !eop+, 10         // line 10
+        .byte $fe, $02          // BANK0
         .text "0:"
-        .byte $9e                // SYS
+        .byte $9e               // SYS$addr
         .text "$"
         .text toHexString(addr)
-        .byte $00                // end of line
+        .byte 0                 // eol
 !eop:
-        .byte $00,$00           // end of program
+        .word 0                 // eop
 }
 
-.macro BenchmarkUpstart(addr) {
+.macro Basic65Benchmark(addr) {
         * = $2001 "BASIC Upstart"
 
         .encoding "petscii_upper"
-        .word !line10+, 10
-        .byte $9c
+        .word !line10+, 10      // line 10
+        .byte $9c               // CLRTI
         .text "TI:"
-        .byte $fe, $02
+        .byte $fe, $02          // BANK0
         .text "0:"
-        .byte $9c
-        .text "TI:"
-        .byte $9e
+        .byte $9e               // SYS$addr
         .text "$"
         .text toHexString(addr)
-        .text ":ET"
+        .text ":ET"             // ET=TI
         .byte $b2
         .text "TI"
-        .byte 0
+        .byte 0                 // eol
 !line10:
-        .word !eop+, 20
-        .byte $e8, $3a, $99
+        .word !eop+, 20         // line 20
+        .byte $e8, $3a, $99     // SCNCLR:PRINTET
         .text "ET"
-        .byte 0
+        .byte 0                 // eol
 !eop:
-        .word 0
+        .word 0                 // eop
 }
 
 .macro GoFaster() {

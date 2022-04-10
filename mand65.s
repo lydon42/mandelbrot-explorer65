@@ -22,11 +22,10 @@
  */
 
 #if BENCHMARK
-	BenchmarkUpstart($2030)
+	Basic65Benchmark($2030)
 #else
         Basic65Upstart($2030)
 #endif
-        
 
 	* = $2030 "Program"
 
