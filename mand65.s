@@ -13,7 +13,7 @@
 // some locations need to be defined
 .const BASEPAGE  = ((>theend)+1) // right after our program
 .const VICSTATE  = $f0    // basepage storage for old vic state
-.const SCREENMEM = $3000
+.const SCREENMEM = (theend & $ff00) + $200
 .const GRAPHMEM  = $40000 // this is character ram
 .const COLORRAM  = $81000 // this is in high ram $ff 8 0000
 
@@ -21,13 +21,7 @@
  * Start of Mandelbrot Explorer 65
  */
 
-#if BENCHMARK
-	Basic65Benchmark($2030)
-#else
-        Basic65Upstart($2030)
-#endif
-
-	* = $2030 "Program"
+	Basic65Upstart()
 
 	GoFaster()
 	UnmapMemory()
