@@ -1,10 +1,11 @@
 .cpu _45gs02
 .encoding "petscii_upper"
 
-#import "include/mega65macros.s"
-#import "include/mega65defs.s"
-#import "include/fixedpt32defs.s"
-#import "include/mandelbrot32defs.s"
+#import "mega65defs.s"
+#import "mega65macros.s"
+#import "fixedpt32defs.s"
+#import "mandelbrot32defs.s"
+#import "vic4fcm_macros.s"
 
 // set to 1 to enable debugging
 .eval DEBUG = 0
@@ -14,12 +15,18 @@
 .const VICSTATE  = $f0    // basepage storage for old vic state
 .const SCREENMEM = $3000
 .const GRAPHMEM  = $40000 // this is character ram
+.const COLORRAM  = $81000 // this is in high ram $ff 8 0000
 
 /*
  * Start of Mandelbrot Explorer 65
  */
 
+#if BENCHMARK
 	BenchmarkUpstart($2030)
+#else
+        Basic65Upstart($2030)
+#endif
+        
 
 	* = $2030 "Program"
 
@@ -27,82 +34,23 @@
 	UnmapMemory()
 	EnableVIC4()
 
-	sei		// disable interupts
-	cld		// no binary decimals
-	lda #BASEPAGE
-	tab		// move base-page so we can use base page addresses for everything
+	MoveBasePage(BASEPAGE)
+        UARTClearKey()
 
 /*
  * Initialize Graphics
  */
-        lda #0
-        sta DMA_ADDRBANK
-        lda #>dma_cls
-        sta DMA_ADDRMSB
-        lda #<dma_cls
-        sta DMA_ADDRLSB_ETRIG   // clear screen & charram
-        lda #0
-        sta DMA_ADDRBANK
-        lda #>dma_clscol
-        sta DMA_ADDRMSB
-        lda #<dma_clscol
-        sta DMA_ADDRLSB_ETRIG   // clear colorram
+        VIC4_StoreState(VICSTATE)
 
-        // store VIC states for later restore (in basepage)
-        lda VICIII_SCRNMODE
-        sta VICSTATE
-        lda VICIV_SCRNMODE
-        sta VICSTATE+1
-        lda VICIV_SCRNPTR1
-        sta VICSTATE+2
-        lda VICIV_SCRNPTR2
-        sta VICSTATE+3
-        lda VICIV_SCRNPTR3
-        sta VICSTATE+4
-        lda VICIV_SCRNPTR4
-        sta VICSTATE+5
-        lda VICIV_LINESTEPLO
-        sta VICSTATE+6
-        lda VICIV_LINESTEPHI
-        sta VICSTATE+7
-        lda VICIV_PALETTE
-        sta VICSTATE+8
-        lda VICIV_CHRCOUNT
-        sta VICSTATE+9
+        FCM_InitScreenMemory(0, SCREENMEM, GRAPHMEM, 0, COLORRAM, 1)
+
+        FCM_ScreenOn(SCREENMEM, GRAPHMEM, COLORRAM)
         
-        //// copied from basic.
-        //// 40x25 - 80x50 screen, with screen RAM at $3000-$3FFF, colour RAM at $FF80000-$FF81FFF
-        ////
-        //// IMPORTANT: setting must come before changing scrnptr!
-        ////
-        lda #%10001000          // clear H640 and V400 for 320x200
-        trb VICIII_SCRNMODE
-        lda #%00000101          // set FCLRHI CHR16 for super extended attr mode
-        tsb VICIV_SCRNMODE
-
-        lda #80
-        sta VICIV_LINESTEPLO
         lda #0
-        sta VICIV_LINESTEPHI    // one line of 40 chars is 80 byte
-
-        lda #40
-        sta VICIV_CHRCOUNT      // we are drawing only 40 chars
-
-        lda #<SCREENMEM
-        sta VICIV_SCRNPTR1
-        lda #>SCREENMEM
-        sta VICIV_SCRNPTR2
-        lda #<[SCREENMEM >> 16]
-        sta VICIV_SCRNPTR3
-        sta scrn_point+2
-        lda #0
-        sta VICIV_SCRNPTR4
-        sta scrn_point+3
-
         sta VICIV_BORDERCOL
         sta VICIV_SCREENCOL     // black back and border
 
-        lda #%01010101
+        lda #%01010101          // default palette is %11 = 3
         sta VICIV_PALETTE       // toggle palette to something else
 
         // copy palette
@@ -112,41 +60,6 @@
         sta DMA_ADDRMSB
         lda #<dma_copypal
         sta DMA_ADDRLSB_ETRIG   // copy commander x16 palette
-
-        // fill screen with pointers to $40000 y by x
-        lda #<[GRAPHMEM>>6]
-        sta scrn_row
-        lda #>[GRAPHMEM>>6]
-        sta scrn_row+1          // set $14/$15 to current charcode $1000 = $40000 absolute
-        ldz #0                  // z loop index
-scrnfilx:
-        lda #<SCREENMEM
-        sta scrn_point
-        lda #>SCREENMEM
-        sta scrn_point+1 // set low word of addr ptr to $3000
-        ldy #25          // y loop counter
-scrnfily:
-        lda scrn_row
-        sta ((scrn_point)),z      // put low byte of char on screen
-        inz                     // next index
-        lda scrn_row+1
-        sta ((scrn_point)),z      // put high byte of char on screen
-        dez                     // prev index
-        inc scrn_row
-        bne !ov+
-        inc scrn_row+1   // increment character by one
-!ov:    lda #80
-        clc
-        adc scrn_point
-        sta scrn_point
-        bcc !ov+
-        inc scrn_point+1 // add 80 to pointer
-!ov:    dey
-        bne scrnfily    // next y
-        inz
-        inz             // inc x index by 2
-        cpz #80         // cmp to 80 (end of line)
-        bne scrnfilx
 
 //
 // MANDELBROT
@@ -259,77 +172,16 @@ smallrow:
 
 endloop:
 #if !BENCHMARK
-        jsr waitkey
+        UARTWaitKey()
 #endif
 
-        lda VICSTATE
-        sta VICIII_SCRNMODE
-        lda VICSTATE+1
-        sta VICIV_SCRNMODE
-        lda VICSTATE+6
-        sta VICIV_LINESTEPLO
-        lda VICSTATE+7
-        sta VICIV_LINESTEPHI
-        lda VICSTATE+9
-        sta VICIV_CHRCOUNT
-        lda VICSTATE+2
-        sta VICIV_SCRNPTR1
-        lda VICSTATE+3
-        sta VICIV_SCRNPTR2
-        lda VICSTATE+4
-        sta VICIV_SCRNPTR3
-        lda VICSTATE+5
-        sta VICIV_SCRNPTR4
-        lda VICSTATE+8
-        sta VICIV_PALETTE
-        lda #6
-        sta VICIV_SCREENCOL
-        sta VICIV_BORDERCOL
+        VIC4_RestoreState(VICSTATE)
 
         lda #0
         tab                     // restore base-page to 0
         //dec $D019              // this before the cli to clear pending interrupt?
         //cli                    // allow interrupts - BASIC SYS handles this
         rts                     // return
-
-waitkey:
-        // clear key buffer
-!loop:  lda UART_ASCIIKEY
-        beq !wait+
-        sta UART_ASCIIKEY
-        bra !loop-
-
-!wait:  // wait for key
-!loop:  lda UART_ASCIIKEY
-        beq !loop-
-
-        // clear key buffer
-!loop:  lda UART_ASCIIKEY
-        beq !end+
-        sta UART_ASCIIKEY
-        bra !loop-
-!end:   rts
-
-dma_cls:
-        // clear character rom
-        .byte $0a, $00  // no enhanced options
-        .byte DMA_FILL
-        .word 64*40*25
-        .word $0000     // fill tile 0
-        .byte $00       // src bank (ignored)
-        .word [GRAPHMEM & $ffff]  // dest
-        .byte <[GRAPHMEM>>16] // destbnk(0-3) + flags
-        .word $0000     // modulo (ignored)
-
-dma_clscol:
-        .byte $0a, $81, $ff, $00 // 11 byte mode, dest bank $ff
-        .byte DMA_FILL
-        .word 2000      // 2*40*25 (chr16 lowres)
-        .word $0001     // fill colour 1 (white)
-        .byte $00       // src bank (ignored)
-        .word $0000     // dest
-        .byte $08       // destbnk -> FF 8 0000
-        .word $0000     // modulo (ignored)
 
 dma_copypal:
         .byte $0a, $00  // 11 byte mode
@@ -341,9 +193,10 @@ dma_copypal:
         .byte $80       // dma visible(7)
         .word $0000
 
-#import "include/fixedpt32.s"
-#import "include/mandelbrot32.s"
-#import "include/palette.s"
+#import "vic4fcm.s"
+#import "fixedpt32.s"
+#import "mandelbrot32.s"
+#import "palette.s"
 
 // Mandeldata:
 mand_base:

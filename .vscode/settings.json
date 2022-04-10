@@ -1,4 +1,12 @@
 {
-    "kickassembler.startup": "mand65.ks",
-    "kickassembler.outputDirectory": ".kickass"
+    "kickassembler.outputDirectory": ".kickass",
+    "kickassembler.assemblerLibraryPaths": [
+        "/home/ograf/devel/mega65/mandelbrot-explorer65/include"
+    ],
+    "kickassembler.opcodes.45gs02": true,
+    "kickassembler.opcodes.65c02": true,
+    "kickassembler.opcodes.65ce02": true,
+    "kickassembler.autoAssembleTrigger": "disable (manual build only)",
+    "kickassembler.editor.showDiagnostics": false,
+    "kickassembler.editor.showNotifications": false
 }

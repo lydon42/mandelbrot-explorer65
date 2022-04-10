@@ -1,8 +1,5 @@
 #importonce
 
-.const M65_SCREEN_BANK = 0
-.const M65_COLRAM_BANK = 1
-
 // DMA
 
 .const DMA_COPY  = %00000000
