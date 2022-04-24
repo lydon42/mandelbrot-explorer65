@@ -6,7 +6,11 @@
     "kickassembler.opcodes.45gs02": true,
     "kickassembler.opcodes.65c02": true,
     "kickassembler.opcodes.65ce02": true,
-    "kickassembler.autoAssembleTrigger": "disable (manual build only)",
+    "kickassembler.autoAssembleTrigger":"onChange and onSave",
+    "kickassembler.autoAssembleTriggerDelay": 5,
     "kickassembler.editor.showDiagnostics": false,
-    "kickassembler.editor.showNotifications": false
+    "kickassembler.editor.showNotifications": false,
+    "kickassembler.completionParameterPlaceholders": true,
+    "kickassembler.assembler.option.viceSymbols": false,
+    "kickassembler.assembler.option.outputDirectory": "",
 }

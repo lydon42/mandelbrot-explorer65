@@ -15,7 +15,7 @@
         * = $2001 "BASIC Upstart"
 
         .encoding "petscii_upper"
-        .word !nextline+, 10      // line 10
+        .word !nextline+, 10    // line 10
 #if BENCHMARK
         .byte $9c               // CLRTI
         .text "TI:"
@@ -24,10 +24,10 @@
         .text "0:"
         .byte $9e               // SYS$addr
         .text "$"
-        .byte $30 + ((main>>12) & $f)
-        .byte $30 + ((main>>8) & $f)
-        .byte $30 + ((main>>4) & $f)
-        .byte $30 + (main & $f)
+        .byte $30 + ((!main+>>12) & $f)
+        .byte $30 + ((!main+>>8) & $f)
+        .byte $30 + ((!main+>>4) & $f)
+        .byte $30 + (!main+ & $f)
 #if BENCHMARK
         .text ":ET"             // ET=TI
         .byte $b2
@@ -44,7 +44,7 @@
 #endif
         .word 0                 // eop
 
-main:
+!main:
         * = * "Main"
 }
 
@@ -59,7 +59,7 @@ main:
         tay
         taz
         map
-        eom                        // zero out memory mapping
+        eom                     // zero out memory mapping
 }
 
 .macro EnableVIC4() {
@@ -86,10 +86,10 @@ main:
 // Disabled Interrupts, clears Decimal flag and moves BasePage
 //
 .macro MoveBasePage(basepage) {
-        sei                // disable interupts
-        cld                // no binary decimals
+        sei                     // disable interupts
+        cld                     // no binary decimals
         lda #basepage
-        tab                // move base-page so we can use base page addresses for everything
+        tab                     // move base-page so we can use base page addresses for everything
 }
 
 .macro ResetBasePage() {
