@@ -1,0 +1,28 @@
+An introduction into some of the basic features of the MEGA65 Full Color Text Mode, the one used in Mandelbrot Explorer 65.
+
+Mandelbrot Explorer 65 is both a mandelbrot set generator for the MEGA65 as well as the project where I learn and test new features of the MEGA65. My goal is to make a video about each new trick or feature, so you can learn from it too.
+
+github repository: https://github.com/lydon42/mandelbrot-explorer65
+
+KickAssembler65ce02: https://gitlab.com/jespergravgaard/kickassembler65ce02
+VScode extension: https://marketplace.visualstudio.com/items?itemName=paulhocker.kick-assembler-vscode-ext
+
+MEGA65: https://mega65.org/
+
+Chapters:
+00:00 - Intro
+00:52 - It's full of VIC!
+02:05 - VIC-IV FCM
+02:47 - Basic Setup
+07:47 - VIC-IV Macros Start
+11:56 - FCM Memory Layout
+14:52 - Activating FCM Mode
+17:21 - Initialise Screen
+19:52 - DMA Job Quick Reference
+21:01 - Clearing Graphics and Colour RAM
+24:38 - Drawing some Pixels
+27:00 - Using one tile two times
+28:25 - Add text to FCM Screen
+30:19 - Bonus: DMA Line drawing
+33:16 - Possibilities
+34:17 - Outro
