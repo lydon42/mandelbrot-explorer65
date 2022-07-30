@@ -24,10 +24,10 @@
         .text "0:"
         .byte $9e               // SYS$addr
         .text "$"
-        .byte $30 + ((!main+>>12) & $f)
-        .byte $30 + ((!main+>>8) & $f)
-        .byte $30 + ((!main+>>4) & $f)
-        .byte $30 + (!main+ & $f)
+        .byte floor(((!main+>>12) & $f)/10)*7 + $30 + ((!main+>>12) & $f)
+        .byte floor(((!main+>>8) & $f)/10)*7 + $30 + ((!main+>>8) & $f)
+        .byte floor(((!main+>>4) & $f)/10)*7 + $30 + ((!main+>>4) & $f)
+        .byte floor((!main+ & $f)/10)*7 + $30 + (!main+ & $f)
 #if BENCHMARK
         .text ":ET"             // ET=TI
         .byte $b2
