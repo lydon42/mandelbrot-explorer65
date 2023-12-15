@@ -185,6 +185,21 @@
 #endif
 }
 
+// adds content of Q(addr_b) to Q(addr_a) and stores result in Q(addr_a)
+.macro FP_DIRECT_ADD(addr_a, addr_b) {
+#if JUSTUSEQ
+        ldq addr_a
+        clc
+        adcq addr_b
+        stq addr_a
+#else
+        FP_MOV(addr_a, FP_A)
+        FP_MOV(addr_b, FP_B)
+        jsr fp_add
+        FP_MOV(FP_C, addr_a)   // advance c.i
+#endif
+}
+
 .macro FP_SUB() {
 #if JUSTUSEQ
         ldq FP_A

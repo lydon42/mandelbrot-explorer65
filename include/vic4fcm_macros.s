@@ -129,7 +129,7 @@
         .word $0000                     // modulo (ignored)
         // clear colour ram low-bytes with 0
         .byte $0a                       // 11 byte mode
-        .byte $81, $ff                  // dest bank $ff
+        .byte $81, [(colram>>20) & $ff] // dest bank $ff
         .byte $85, $02                  // increment by 2
         .byte $00                       // eol
         .byte DMA_FILL|DMA_CHAIN        // fill, chain next job

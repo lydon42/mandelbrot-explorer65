@@ -8,13 +8,33 @@
 .const DMA_FILL  = %00000011
 .const DMA_CHAIN = %00000100
 
-.const DMA_ADDRLSB_TRIG  = $d700
-.const DMA_ADDRMSB       = $d701
-.const DMA_ADDRBANK      = $d702
-.const DMA_CONTROL       = $d703 // bit 1 = Enable F018b mode
-.const DMA_ADDRLSB_ETRIG = $d705 // LSB for MEGA65 DMA Extensions
+.const DMA_ADDRLSB_TRIG  = $D700
+.const DMA_ADDRMSB       = $D701
+.const DMA_ADDRBANK      = $D702
+.const DMA_CONTROL       = $D703 // bit 1 = Enable F018b mode
+.const DMA_ADDRLSB_ETRIG = $D705 // LSB for MEGA65 DMA Extensions
 .const M65_SCREEN        = $0800
 .const M65_COLRAM        = $f800
+
+// VIC-II
+.const VICII_SPR0X       = $D000
+.const VICII_SPR0Y       = $D001
+.const VICII_SPR1X       = $D002
+.const VICII_SPR1Y       = $D003
+.const VICII_SPR2X       = $D004
+.const VICII_SPR2Y       = $D005
+.const VICII_SPR3X       = $D006
+.const VICII_SPR3Y       = $D007
+.const VICII_SPR4X       = $D008
+.const VICII_SPR4Y       = $D009
+.const VICII_SPR5X       = $D00A
+.const VICII_SPR5Y       = $D00B
+.const VICII_SPR6X       = $D00C
+.const VICII_SPR6Y       = $D00D
+.const VICII_SPR7X       = $D00E
+.const VICII_SPR7Y       = $D00F
+.const VICII_SPRXMSBS    = $D010
+.const VICII_SPTRENA     = $D015
 
 // VIC-III
 
@@ -72,6 +92,10 @@
 .const VICIV_CHARPTRLO  = $D068
 .const VICIV_CHARPTRHI  = $D069
 .const VICIV_CHARPTRBN  = $D06A
+.const VICIV_SPR16ENA     = $D06B
+.const VICIV_SPRPTRADRLSB = $D06C
+.const VICIV_SPRPTRADRMSB = $D06D
+.const VICIV_SPRPTRADRBNK = $D06E
 .const VICIV_PALETTE    = $D070     // MAPEDPAL(2) BTPALSEL(2) SPRPALSEL(2) ABTPALSEL(2)
 
 // C65 4551 UART

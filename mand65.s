@@ -11,11 +11,11 @@
 .eval DEBUG = 0
 
 // some locations need to be defined
-.const BASEPAGE  = ((>theend)+1) // right after our program
-.const VICSTATE  = $f0    // basepage storage for old vic state
-.const SCREENMEM = (theend & $ff00) + $200
-.const GRAPHMEM  = $40000 // this is character ram
-.const COLORRAM  = $81000 // this is in high ram $ff 8 0000
+.const BASEPAGE  = ((>theend)+1)            // right after our program
+.const VICSTATE  = $f0                      // basepage storage for old vic state
+.const SCREENMEM = (theend & $ff00) + $200  // after basepage
+.const GRAPHMEM  = $40000                   // this is character ram
+.const COLORRAM  = $ff81000                 // this is in high ram $ff 8 0000
 
 /*
  * Start of Mandelbrot Explorer 65
@@ -97,17 +97,7 @@ yloop:
         ldz #0
         sta ((scrn_point)),z
 
-#if JUSTUSEQ
-        ldq mand_ci
-        clc
-        adcq mand_di
-        stq mand_ci
-#else
-        FP_MOV(mand_ci, FP_A)
-        FP_MOV(mand_di, FP_B)
-        jsr fp_add
-        FP_MOV(FP_C, mand_ci)   // advance c.i
-#endif
+        FP_DIRECT_ADD(mand_ci,mand_di)
 
         lda #8
         clc
@@ -118,17 +108,7 @@ yloop:
 !nov:   dec scrn_y              // dec yloop counter
         bne yloop
 
-#if JUSTUSEQ
-        ldq mand_cr
-        clc
-        adcq mand_dr
-        stq mand_cr
-#else
-        FP_MOV(mand_cr, FP_A)
-        FP_MOV(mand_dr, FP_B)
-        jsr fp_add
-        FP_MOV(FP_C, mand_cr)   // advance c.r
-#endif
+        FP_DIRECT_ADD(mand_cr,mand_dr)
 
         inc scrn_x
         bne !nov+
